@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { Shield, Building2, User, Mail, Lock, CheckCircle, ArrowRight, AlertTriangle } from 'lucide-react';
 
-type ViewState = 'LOGIN' | 'REGISTER' | 'FORGOT';
+type ViewState = 'LOGIN' | 'REGISTER' | 'FORGOT' | 'SUCCESS';
 
 const Welcome = () => {
   const { registerCompany, loginCompany, recoverCompanyPassword, companyAccount } = useStore();
@@ -57,13 +57,16 @@ const Welcome = () => {
       return;
     }
 
+    // Register but do NOT auto-login yet, so we can show success screen
     registerCompany({
       companyName: regCompany,
       document: regDoc,
       email: regEmail,
       phone: regPhone,
       password: regPass
-    });
+    }, false);
+
+    setView('SUCCESS');
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -75,6 +78,11 @@ const Welcome = () => {
     } else {
       setError('Credenciais inválidas. Verifique seus dados.');
     }
+  };
+
+  const handleSuccessLogin = () => {
+    // Use the registered credentials to login immediately
+    loginCompany(regEmail, regPass);
   };
 
   const handleForgot = (e: React.FormEvent) => {
@@ -238,6 +246,36 @@ const Welcome = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* SUCCESS VIEW (Email Confirmation Simulation) */}
+          {view === 'SUCCESS' && (
+            <div className="animate-fade-in text-center flex flex-col items-center justify-center h-full">
+               <div className="bg-green-100 p-4 rounded-full mb-6">
+                 <CheckCircle size={64} className="text-green-600" />
+               </div>
+               <h2 className="text-3xl font-bold text-gray-800 mb-2">Cadastro Realizado!</h2>
+               <p className="text-gray-600 mb-6 max-w-sm">
+                 Sua conta empresarial foi criada com sucesso e os dados foram salvos no dispositivo.
+               </p>
+               
+               <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg mb-8 max-w-sm text-left flex items-start gap-3">
+                 <Mail className="text-blue-500 mt-1 flex-shrink-0" size={20} />
+                 <div>
+                    <h4 className="font-bold text-blue-800 text-sm">Verifique seu E-mail</h4>
+                    <p className="text-blue-700 text-sm mt-1">
+                      Enviamos uma notificação de confirmação e boas-vindas para <strong>{regEmail}</strong>.
+                    </p>
+                 </div>
+               </div>
+
+               <button 
+                 onClick={handleSuccessLogin}
+                 className="w-full max-w-xs bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
+               >
+                 Acessar Sistema Agora <ArrowRight size={18} />
+               </button>
             </div>
           )}
 

@@ -10,10 +10,11 @@ const INITIAL_PRODUCTS: Product[] = [
   { id: '5', code: '9999', name: 'Produto Teste Sem Categoria', price: 10.00, stock: 10, category: 'Sem Categoria', image: 'https://picsum.photos/204' },
 ];
 
+// Added passwords '1234' for demo purposes
 const INITIAL_USERS: User[] = [
-  { id: '1', name: 'Administrador', username: 'admin', role: UserRole.ADMIN, isActive: true },
-  { id: '2', name: 'Operador João', username: 'op1', role: UserRole.OPERATOR, isActive: true },
-  { id: '3', name: 'Operadora Maria', username: 'op2', role: UserRole.OPERATOR, isActive: false },
+  { id: '1', name: 'Administrador', username: 'admin', password: '1234', role: UserRole.ADMIN, isActive: true },
+  { id: '2', name: 'Operador João', username: 'op1', password: '1234', role: UserRole.OPERATOR, isActive: true },
+  { id: '3', name: 'Operadora Maria', username: 'op2', password: '1234', role: UserRole.OPERATOR, isActive: false },
 ];
 
 // Base categories to start with
@@ -38,7 +39,7 @@ interface StoreContextType {
   // Company Auth
   companyAccount: CompanyAccount | null;
   isCompanyAuthenticated: boolean;
-  registerCompany: (data: CompanyAccount) => void;
+  registerCompany: (data: CompanyAccount, autoLogin?: boolean) => void;
   loginCompany: (identifier: string, password: string) => boolean;
   logoutCompany: () => void;
   recoverCompanyPassword: (email: string) => boolean;
@@ -187,11 +188,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // --- Company Auth Logic ---
 
-  const registerCompany = (data: CompanyAccount) => {
+  const registerCompany = (data: CompanyAccount, autoLogin: boolean = true) => {
     setCompanyAccount(data);
-    setIsCompanyAuthenticated(true); // Auto login on register
-    // Also update settings company name
+    // Sync company name with settings
     setSettings(prev => ({ ...prev, companyName: data.companyName }));
+    
+    if (autoLogin) {
+      setIsCompanyAuthenticated(true);
+    }
   };
 
   const loginCompany = (identifier: string, password: string) => {
@@ -243,9 +247,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   // --- Operator Auth Logic ---
-  const login = (username: string, _pass: string) => {
+  const login = (username: string, password: string) => {
     const user = users.find(u => u.username === username && u.isActive);
-    if (user) {
+    
+    // Validate Password
+    if (user && user.password === password) {
       setCurrentUser(user);
       return true;
     }

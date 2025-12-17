@@ -7,6 +7,7 @@ export interface User {
   id: string;
   name: string;
   username: string;
+  password?: string; // Password is now optional in interface but required for login check
   role: UserRole;
   isActive: boolean;
 }
