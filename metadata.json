@@ -1,0 +1,5 @@
+{
+  "name": "UniPOS - Ponto de Venda Universal",
+  "description": "Um sistema de PDV abrangente para todos os tipos de e-commerce com gerenciamento sincronizado, controle de estoque e lógica robusta de caixa.",
+  "requestFramePermissions": []
+}
